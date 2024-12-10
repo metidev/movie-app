@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Movies CRUD</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+
+      h1 {
+        color: #333;
+      }
+
+      form {
+        margin-bottom: 20px;
+      }
+
+      input,
+      button {
+        padding: 8px;
+        margin: 5px;
+      }
+
+      button {
+        cursor: pointer;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>Movies CRUD</h1>
+
+    <h2>Add Movie</h2>
+    <form id="add-movie-form" enctype="multipart/form-data">
+      <input type="text" id="title" placeholder="Title" required />
+      <input type="text" id="director" placeholder="Director" />
+      <input type="number" id="release_year" placeholder="Release Year" />
+      <input type="text" id="genre" placeholder="Genre" />
+      <textarea id="description" placeholder="Description"></textarea>
+      <button type="submit">Add Movie</button>
+    </form>
+
+    <div>
+      <h1>Movies</h1>
+      <ul id="movies-list"></ul>
+    </div>
+    <div id="movie-details">
+      <h2>Movie Details</h2>
+    </div>
+  </body>
+
+  <script>
+    const form = document.getElementById("add-movie-form");
+
+    async function viewMovieDetails(movieId) {
+      const response = await fetch(`/movie/${movieId}`);
+      const movie = await response.json();
+
+      const detailsContainer = document.getElementById("movie-details");
+      detailsContainer.innerHTML = `
+          <h2>${movie.title}</h2>
+          <p><strong>Director:</strong> ${movie.director}</p>
+          <p><strong>Release Year:</strong> ${movie.release_year}</p>
+          <p><strong>Genre:</strong> ${movie.genre}</p>
+          <p><strong>Description:</strong> ${movie.description}</p>
+          <img src="${movie.poster_url}" alt="${movie.title}" style="width: 200px; height: auto;">
+        `;
+    }
+
+    // async function fetchMovies() {
+    //   const response = await fetch("/movies");
+    //   const movies = await response.json();
+    //   moviesList.innerHTML = "";
+    //   movies.forEach((movie) => {
+    //     const li = document.createElement("li");
+    //     li.innerHTML = `
+    //   <img src="${movie.poster_path}" alt="${movie.title}" style="width: 100px; height: auto;">
+    //   ${movie.title} (${movie.release_year}) (${movie.description}) - ${movie.director}
+    // `;
+    //     const deleteButton = document.createElement("button");
+    //     deleteButton.textContent = "Delete";
+    //     deleteButton.onclick = async () => {
+    //       await fetch(`/movies/${movie.id}`, { method: "DELETE" });
+    //       fetchMovies();
+    //     };
+    //     li.appendChild(deleteButton);
+    //     moviesList.appendChild(li);
+    //   });
+    // }
+
+    async function fetchMovies() {
+      const response = await fetch("/movies");
+      const movies = await response.json();
+
+      const moviesList = document.getElementById("movies-list");
+      moviesList.innerHTML = "";
+
+      movies.forEach((movie) => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+      <img src="${movie.poster_url}" alt="${movie.title}" style="width: 100px; height: auto;">
+      <span>${movie.title} (${movie.release_year})</span>
+      <button onclick="viewMovieDetails(${movie.id})">View Details</button>
+    `;
+        const deleteButton = document.createElement("button");
+        deleteButton.textContent = "Delete";
+        deleteButton.onclick = async () => {
+          await fetch(`/movies/${movie.id}`, { method: "DELETE" });
+          fetchMovies();
+        };
+        li.appendChild(deleteButton);
+        moviesList.appendChild(li);
+      });
+    }
+
+    form.onsubmit = async (e) => {
+      e.preventDefault();
+
+      const formData = new FormData();
+      formData.append("title", document.getElementById("title").value);
+      formData.append(
+        "description",
+        document.getElementById("description").value
+      );
+      formData.append("director", document.getElementById("director").value);
+      formData.append(
+        "release_year",
+        document.getElementById("release_year").value
+      );
+      formData.append("genre", document.getElementById("genre").value);
+
+      // // upload poster
+      // const uploadResponse = await fetch("/upload", {
+      //   method: "POST",
+      //   body: formData,
+      // });
+      // const uploadData = await uploadResponse.json();
+      // const posterPath = uploadData.filePath;
+
+      // send movie data
+      await fetch("/movies", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: formData.get("title"),
+          description: formData.get("description"),
+          director: formData.get("director"),
+          release_year: parseInt(formData.get("release_year")),
+          genre: formData.get("genre"),
+        }),
+      });
+
+      form.reset();
+      fetchMovies();
+    };
+
+    fetchMovies();
+  </script>
+</html>
