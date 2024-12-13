@@ -8,15 +8,15 @@ import './services/db_services.dart';
 
 class PosterCache {
   static final Map<String, String?> _cache = {};
-  
+
   static String? get(String title) {
     return _cache[title];
   }
-  
+
   static void set(String title, String? posterPath) {
     _cache[title] = posterPath;
   }
-  
+
   static bool has(String title) {
     return _cache.containsKey(title);
   }
@@ -28,8 +28,7 @@ Future<String?> getMoviePosterFromTitle(String title) async {
   }
 
   try {
-    final apiKey =
-        '08e24c22d9843175ff968c55deeb1b27'; // TMDB API key
+    final apiKey = '08e24c22d9843175ff968c55deeb1b27'; // TMDB API key
     final query = Uri.encodeComponent(title);
     final url = Uri.parse(
         'https://api.themoviedb.org/3/search/movie?api_key=$apiKey&query=$query');
@@ -183,7 +182,7 @@ void main() async {
   });
   // static server for showing web files
   final staticHandler =
-      createStaticHandler('web', defaultDocument: 'index.html');
+      createStaticHandler('web2', defaultDocument: 'index.html');
   final handler = Cascade().add(staticHandler).add(router.call).handler;
 
   // start server

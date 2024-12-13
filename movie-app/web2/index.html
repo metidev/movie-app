@@ -1,0 +1,113 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Movie App</title>
+    <!-- Inter Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet" />
+    <!-- Beer CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/beercss@3.7.14/dist/cdn/beer.min.css" rel="stylesheet" />
+    <script type="module" src="https://cdn.jsdelivr.net/npm/beercss@3.7.14/dist/cdn/beer.min.js"></script>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body class="p-3">
+    <!-- Navigation Bar -->
+    <nav class="bottom">
+      <a>
+        <i>account_circle</i>
+        <div>Profile</div>
+      </a>
+      <a onclick="ui('#add-movie')">
+        <i>add</i>
+        <div>Add</div>
+      </a>
+      <a class="active" href="index.html">
+        <i>home</i>
+        <div>Home</div>
+      </a>
+    </nav>
+
+    <!-- Header -->
+    <main class="responsive">
+      <header class="rounded-xl">
+        <nav>
+          <button onclick="darkModeSwitch()" class="circle transparent">
+            <i>dark_mode</i>
+          </button>
+          <h3 class="max text-xl center-align">Movies</h3>
+          <button class="circle transparent">
+            <img class="responsive" src="https://avatars.githubusercontent.com/u/56591382?v=4" />
+          </button>
+        </nav>
+      </header>
+
+      <div id="delete-movie-modal" class="modal">
+        <div class="modal-content">
+          <h2>Delete Movie</h2>
+          <p>Are you sure you want to delete this movie?</p>
+          <div class="modal-actions">
+            <button class="btn-primary" onclick="cancelDelete()">Cancel</button>
+            <button class="btn-trash" onclick="confirmDeleteMovie()">Delete</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Movies -->
+      <div id="movies-list" style="margin-top: 1rem;">
+       
+      </div>
+
+      <!-- Add Movie Dialog -->
+      <dialog class="p-5 max" id="add-movie">
+        <form id="add-movie-form">
+        <header class="rounded-xl">
+          <nav>
+            <button onclick="ui('#add-movie')" class="circle transparent">
+              <i>close</i>
+            </button>
+            <h3 class="max text-xl center-align">Add Movie</h3>
+            <button class="circle transparent">
+              <i>check</i>
+            </button>
+          </nav>
+        </header>
+        <!-- Fields -->
+        <div class="field border label my-4">
+          <input id="title" />
+          <label>Title</label>
+        </div>
+        <div class="field border label my-4">
+          <input id="director" />
+          <label>Director</label>
+        </div>
+        <div class="field border label textarea h-52 my-4">
+          <textarea id="description"></textarea>
+          <label>Description</label>
+        </div>
+        <div class="field border label my-4">
+          <input id="genre" />
+          <label>Genre</label>
+        </div>
+        <div class="field border label my-4">
+          <input id="release_year" type="number" />
+          <label>Release Year</label>
+        </div>
+        <button type="submit" class="extra primary responsive round my-3">
+          <span>Save Movie</span>
+        </button>
+      </form>
+      </dialog>
+
+      <!-- Movie details dialog -->
+      <dialog class="p-5 max" id="movie-detail">
+        <div id="movie-details-content">
+      
+      </div>
+      </dialog>
+    </main>
+
+    <script src="./js/main.js"></script>
+  </body>
+</html>
