@@ -6,8 +6,6 @@ class DBService {
     port: 3306,
     user: 'root',
     password: null,
-    // user: 'movie',
-    // password: 'OCs8X.rcEi@uKfyY',
     db: 'movies_db',
   );
 

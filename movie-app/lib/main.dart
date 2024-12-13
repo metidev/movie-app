@@ -6,6 +6,59 @@ import 'package:shelf_router/shelf_router.dart';
 import 'package:shelf_static/shelf_static.dart';
 import './services/db_services.dart';
 
+class PosterCache {
+  static final Map<String, String?> _cache = {};
+  
+  static String? get(String title) {
+    return _cache[title];
+  }
+  
+  static void set(String title, String? posterPath) {
+    _cache[title] = posterPath;
+  }
+  
+  static bool has(String title) {
+    return _cache.containsKey(title);
+  }
+}
+
+Future<String?> getMoviePosterFromTitle(String title) async {
+  if (PosterCache.has(title)) {
+    return PosterCache.get(title);
+  }
+
+  try {
+    final apiKey =
+        '08e24c22d9843175ff968c55deeb1b27'; // TMDB API key
+    final query = Uri.encodeComponent(title);
+    final url = Uri.parse(
+        'https://api.themoviedb.org/3/search/movie?api_key=$apiKey&query=$query');
+
+    final httpClient = HttpClient();
+    final request = await httpClient.getUrl(url);
+    final response = await request.close();
+
+    if (response.statusCode == 200) {
+      final data = await response.transform(utf8.decoder).join();
+      final jsonData = jsonDecode(data);
+      final results = jsonData['results'] as List;
+      httpClient.close();
+
+      if (results.isNotEmpty) {
+        final posterPath = results[0]['poster_path'];
+        PosterCache.set(title, posterPath);
+        return posterPath;
+      }
+    }
+    httpClient.close();
+    PosterCache.set(title, null);
+    return null;
+  } catch (e) {
+    print('Error fetching poster: $e');
+    return null;
+  }
+}
+
 void main() async {
   final dbService = DBService();
   final router = Router();
@@ -14,15 +67,17 @@ void main() async {
   router.get('/movies', (Request request) async {
     final movies = await dbService.getAllMovies();
 
-    final moviesWithDetails = movies.map((movie) {
-      movie['poster_url'] =
-          'https://picsum.photos/200/300?random=${movie['id']}';
+    final moviesWithDetails = await Future.wait(movies.map((movie) async {
+      final posterPath = await getMoviePosterFromTitle(movie['title']);
+      movie['poster_url'] = posterPath != null
+          ? 'https://image.tmdb.org/t/p/w500$posterPath'
+          : 'https://via.placeholder.com/500x750?text=${Uri.encodeComponent(movie['title'])}';
       movie['release_date'] =
           (movie['release_date'] as DateTime?)?.toIso8601String();
       movie['created_at'] =
           (movie['created_at'] as DateTime?)?.toIso8601String();
       return movie;
-    }).toList();
+    }));
 
     return Response.ok(
       jsonEncode(moviesWithDetails),
@@ -45,10 +100,10 @@ void main() async {
   });
 
   // Path to save files
-  final uploadDirectory = Directory('uploads');
-  if (!uploadDirectory.existsSync()) {
-    uploadDirectory.createSync();
-  }
+  // final uploadDirectory = Directory('uploads');
+  // if (!uploadDirectory.existsSync()) {
+  //   uploadDirectory.createSync();
+  // }
 
   // upload file poster
   // router.post('/upload', (Request request) async {
@@ -86,7 +141,6 @@ void main() async {
   //   }
   // });
 
-
   // remove movie
   router.delete('/movies/<id|[0-9]+>', (Request request, String id) async {
     await dbService.deleteMovie(int.parse(id));
@@ -100,6 +154,7 @@ void main() async {
         return Response.notFound(jsonEncode({'error': 'Movie not found'}));
       }
 
+      // Format dates
       if (movie['release_year'] is DateTime) {
         movie['release_year'] =
             (movie['release_year'] as DateTime).toIso8601String();
@@ -109,7 +164,11 @@ void main() async {
             (movie['created_at'] as DateTime).toIso8601String();
       }
 
-      movie['poster_url'] = 'https://picsum.photos/200/300?random=$id';
+      // Get poster from title
+      final posterPath = await getMoviePosterFromTitle(movie['title']);
+      movie['poster_url'] = posterPath != null
+          ? 'https://image.tmdb.org/t/p/w500$posterPath'
+          : 'https://via.placeholder.com/500x750?text=${Uri.encodeComponent(movie['title'])}';
 
       return Response.ok(
         jsonEncode(movie),
