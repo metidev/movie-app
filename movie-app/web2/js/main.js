@@ -176,4 +176,11 @@ function cancelDelete() {
   }, 300);
 }
 
+window.onclick = function (event) {
+  const deleteMovieModal = document.getElementById("delete-movie-modal");
+if (event.target === deleteMovieModal) {
+    cancelDelete();
+  }
+};
+
 fetchMovies();
