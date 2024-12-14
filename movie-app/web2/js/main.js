@@ -86,9 +86,9 @@ async function fetchMovies() {
         <img class="!object-top responsive large" src="${movie.poster_url}" />
           <div class="absolute bottom left right padding bottom-shadow white-text">
             <nav>
-              <h5 class="text-md">${movie.title} • ${movie.release_year}</h5>
+              <h5 class="text-md" style="max-width: 65% !important;">${movie.title} • ${movie.release_year}</h5>
               <div class="max"></div>
-              <button onclick="event.stopPropagation(); confirmDelete(${
+              <button onclick="event.stopPropagation(); ui('#delete-movie-modal'); confirmDelete(${
                 movie.id
               }, event)" class="circle transparent">
                 <i>delete</i>
@@ -109,8 +109,6 @@ async function viewMovieDetails(movieId) {
   const response = await fetch(`/movie/${movieId}`);
   const movie = await response.json();
 
-  console.log(movie)
-
   const detailsContainer = document.getElementById("movie-details-content");
   detailsContainer.innerHTML = `
        <header class="rounded-xl">
@@ -125,7 +123,10 @@ async function viewMovieDetails(movieId) {
             </nav>
           </header>
 
-          <img class="mt-4 rounded-xl" src="${movie.poster_url}" />
+          <div id="movie-detail-id" style="display: flex;">
+          <img style="height: 600px;" class="mt-4 rounded-xl" src="${movie.poster_url}" />
+          
+          <div style="padding: 40px;">
           <h1 class="text-3xl">${movie.title}</h1>
           <span class="text-lg my-2 block"> ${movie.director || "unavailable"}</span>
           <div>
@@ -135,6 +136,7 @@ async function viewMovieDetails(movieId) {
               .map((genre) => `<span class="genre-tag">${genre.trim()}</span>`)
               .join("")}
             </button>
+
     
           </div>
           <p class="my-3 text-justify">
@@ -144,6 +146,7 @@ async function viewMovieDetails(movieId) {
             <i>play_circle</i>
             <span>Play Now</span>
           </button>
+              </div>
   `;
 
   const detailsPage = document.getElementById("movie-detail");
@@ -170,17 +173,17 @@ function closeMovieDetails() {
 function confirmDelete(id, event) {
   event.stopPropagation(); // Prevent movie details from opening
   movieToDelete = id;
-  const modal = document.getElementById("delete-movie-modal");
-  modal.style.display = "block";
-  modal.offsetHeight; // Force reflow
-  modal.classList.add("show");
+  // const modal = document.getElementById("delete-movie-modal");
+  // modal.style.display = "block";
+  // modal.offsetHeight; // Force reflow
+  // modal.classList.add("show");
 }
 
 function cancelDelete() {
-  const modal = document.getElementById("delete-movie-modal");
-  modal.classList.remove("show");
+  // const modal = document.getElementById("delete-movie-modal");
+  // modal.classList.remove("show");
   setTimeout(() => {
-    modal.style.display = "none";
+    // modal.style.display = "none";
     movieToDelete = null;
   }, 300);
 }
