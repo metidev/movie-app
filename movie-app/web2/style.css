@@ -798,3 +798,36 @@ body {
   object-fit: cover; /* Ensures the image covers the area */
   object-position: center; /* Centers the image */
 }
+
+/* Add this CSS rule to create a responsive grid for movie cards */
+#movies-list {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr); /* 4 columns */
+  gap: 1rem; /* Space between cards */
+}
+
+/* Ensure movie cards are responsive */
+.movie-card {
+  background: var(--surface); /* Use your surface color */
+  border-radius: 0.5rem; /* Rounded corners */
+  overflow: hidden; /* Prevent overflow */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+@media (max-width: 1024px) {
+  #movies-list {
+    grid-template-columns: repeat(3, 1fr); /* 3 columns for medium screens */
+  }
+}
+
+@media (max-width: 768px) {
+  #movies-list {
+    grid-template-columns: repeat(2, 1fr); /* 2 columns for small screens */
+  }
+}
+
+@media (max-width: 480px) {
+  #movies-list {
+    grid-template-columns: 1fr; /* 1 column for extra small screens */
+  }
+}

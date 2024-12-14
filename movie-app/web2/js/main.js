@@ -2,10 +2,20 @@
 function darkModeSwitch() {
   if (ui("mode") == "dark") {
     ui("mode", "light");
-  } else if (ui("mode") == "light") {
+    localStorage.setItem("theme", "light");
+  } else {
     ui("mode", "dark");
+    localStorage.setItem("theme", "dark");
   }
 }
+
+// On page load, check for saved theme preference
+window.onload = () => {
+  const savedTheme = localStorage.getItem("theme");
+  if (savedTheme) {
+    ui("mode", savedTheme);
+  }
+};
 
 // delete movie
 async function confirmDeleteMovie() {
@@ -54,9 +64,8 @@ form.onsubmit = async (e) => {
   });
 
   form.reset();
-  closeAddMovieModal();
   fetchMovies();
-  location.reload();
+  ui('#add-movie')
 };
 
 // fetch movies
