@@ -28,7 +28,7 @@ Future<String?> getMoviePosterFromTitle(String title) async {
   }
 
   try {
-    final apiKey = '08e24c22d9843175ff968c55deeb1b27'; // TMDB API key
+    final apiKey = ''; // TMDB API key
     final query = Uri.encodeComponent(title);
     final url = Uri.parse(
         'https://api.themoviedb.org/3/search/movie?api_key=$apiKey&query=$query');
